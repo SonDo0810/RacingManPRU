@@ -9,12 +9,17 @@ public class CarController : MonoBehaviour
     public float accelerationFactor = 30.0f;
     public float turnFactor = 3.5f;
     public float maxSpeed = 20;
+    public AnimationCurve jumpCurve;
+    public float jumpDuration = 2;
+    public float jumHeight = 2;
 
-    //Loca variables
-    float accelerationInput = 0;
-    float steeringInput = 0;
-    float rotationAngle = 0;
-    float velocityVsUp = 0;
+    private float accelerationInput = 0;
+    private float steeringInput = 0;
+    private float rotationAngle = 0;
+    private float velocityVsUp = 0;
+
+    private bool isJumping;
+    private Vector3 originScale = new Vector3(1, 1, 1);
 
     //Components
     Rigidbody2D carRigidbody2D;
@@ -34,7 +39,36 @@ public class CarController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKey(KeyCode.Space))
+        {
+            PerformJump();
+        }
+    }
 
+    private void PerformJump()
+    {
+        if (isJumping)
+        {
+            return;
+        }
+        StartCoroutine(Jump());
+    }
+
+    private IEnumerator Jump()
+    {
+        isJumping = true;
+        float startJumpTime = Utils.Times.CurrentFrame();
+        float completedPercentage = 0f;
+        while (completedPercentage < 1f)
+        {
+            completedPercentage = (Utils.Times.CurrentFrame() - startJumpTime) / jumpDuration;
+            float increaseHeight = Utils.Numbers.SinOf(completedPercentage) * jumHeight;
+
+            carRigidbody2D.transform.localScale = originScale * (1f + increaseHeight);
+            yield return 0;
+        }
+
+        isJumping = false;
     }
 
     //Frame-rate independent for physics calculations
