@@ -56,7 +56,7 @@ public class CarController : MonoBehaviour
             return;
 
         //limit so we cannot go faster than the 50% of max speed in the "reverse" direction
-        if(velocityVsUp < -maxSpeed * 0.5f && accelerationInput < 0)
+        if (velocityVsUp < -maxSpeed * 0.5f && accelerationInput < 0)
             return;
 
         //limit so we cannot go faster in any direction while accelerating
@@ -64,7 +64,7 @@ public class CarController : MonoBehaviour
             return;
 
         //Apply drag if there is no accelerationInput so the car stops when the player lets go of the acceleration
-        if(accelerationInput == 0)
+        if (accelerationInput == 0)
         {
             carRigidbody2D.drag = Mathf.Lerp(carRigidbody2D.drag, 3.0f, Time.fixedDeltaTime * 3);
         }
@@ -99,6 +99,31 @@ public class CarController : MonoBehaviour
         Vector2 rightVelocity = transform.right * Vector2.Dot(carRigidbody2D.velocity, transform.right);
 
         carRigidbody2D.velocity = forwardVelocity + rightVelocity * drigtFactor;
+    }
+
+    float GetLateralVelocity()
+    {
+        //Returns how how fast the car is moving sideways. 
+        return Vector2.Dot(transform.right, carRigidbody2D.velocity);
+    }
+
+    public bool IsTireScreeching(out float lateralVelocity, out bool isBraking)
+    {
+        lateralVelocity = GetLateralVelocity();
+        isBraking = false;
+
+        //Check if we are moving forward and if the player is hitting the brakes. In that case the tires should screech.
+        if (accelerationInput < 0 && velocityVsUp > 0)
+        {
+            isBraking = true;
+            return true;
+        }
+
+        //If we have a lot of side movement then the tires should be screeching
+        if (Mathf.Abs(GetLateralVelocity()) > 4.0f)
+            return true;
+
+        return false;
     }
 
     public void SetInputVector(Vector2 inputVector)
