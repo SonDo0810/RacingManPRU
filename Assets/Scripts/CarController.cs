@@ -12,13 +12,17 @@ public class CarController : MonoBehaviour
     public AnimationCurve jumpCurve;
     public float jumpDuration = 2;
     public float jumHeight = 2;
+    public float boostDuration = 3;
+    public float boostIncrement = 10;
 
     private float accelerationInput = 0;
     private float steeringInput = 0;
     private float rotationAngle = 0;
     private float velocityVsUp = 0;
 
-    private bool isJumping;
+    private bool isJumping = false;
+    private bool isBoosting = false;
+
     private Vector3 originScale = new Vector3(1, 1, 1);
 
     //Components
@@ -42,9 +46,13 @@ public class CarController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKey(KeyCode.Space))
+        if (Input.GetKey(KeyCode.RightShift))
         {
             PerformJump();
+        }
+        if (Input.GetKey(KeyCode.Space))
+        {
+            PerformBoost();
         }
     }
 
@@ -61,20 +69,48 @@ public class CarController : MonoBehaviour
     {
         isJumping = true;
         Vector3 shadowPositionVector = new Vector3(1, -1) * 3;
-
         float startJumpTime = Utils.Times.CurrentFrame();
-        float completedPercentage = 0f;
-        while (completedPercentage < 1f)
+
+        while (isJumping)
         {
-            completedPercentage = GetCompletedPercentage(startJumpTime, jumpDuration);
+            float completedPercentage = GetCompletedPercentage(startJumpTime, jumpDuration);
             float increaseRate = Utils.Numbers.SinOf(completedPercentage) * jumHeight;
 
             carRigidbody2D.transform.localScale = originScale * (1f + increaseRate);
             shadow.transform.localPosition = shadowPositionVector * increaseRate;
 
+            isJumping = completedPercentage < 1f;
             yield return 0;
         }
-        isJumping = false;
+    }
+
+    private void PerformBoost()
+    {
+        if (isBoosting || accelerationInput == 0)
+        {
+            return;
+        }
+        StartCoroutine(Boost());
+    }
+
+
+    private IEnumerator Boost()
+    {
+        isBoosting = true;
+
+        float startJumpTime = Utils.Times.CurrentFrame();
+        float originAcceleration = this.accelerationInput;
+        float originMaxSpeed = this.maxSpeed;
+        this.maxSpeed = originMaxSpeed + this.boostIncrement;
+        while (isBoosting)
+        {
+            float completedPercentage = GetCompletedPercentage(startJumpTime, boostDuration);
+            float increaseRate = Utils.Numbers.SinOf(completedPercentage) * jumHeight;
+
+            accelerationInput = originAcceleration + boostIncrement * (1f + increaseRate);
+            isBoosting = completedPercentage < 1f;
+            yield return 0;
+        }
     }
 
     private float GetCompletedPercentage(float startTime, float duration)
