@@ -29,14 +29,6 @@ public class WheelTrailRendererHandler : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //If the car tires are screenching the we'll emitt atrail
-        if (carController.IsTireScreeching(out float lateralVelocity, out bool isBraking))
-        {
-            trailRenderer.emitting = true;
-        }
-        else
-        {
-            trailRenderer.emitting = false;
-        }
+        trailRenderer.emitting = carController.IsTireScreeching(out float lateralVelocity, out bool isBraking);
     }
 }

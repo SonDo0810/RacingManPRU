@@ -22,12 +22,15 @@ public class CarController : MonoBehaviour
     private Vector3 originScale = new Vector3(1, 1, 1);
 
     //Components
-    Rigidbody2D carRigidbody2D;
+    private Rigidbody2D carRigidbody2D;
+    private SpriteRenderer shadow;
+
 
     //Awake is called when the script instance is being loaded
     void Awake()
     {
         carRigidbody2D = GetComponent<Rigidbody2D>();
+        shadow = GameObject.Find("Car").transform.GetChild(1).GetComponent<SpriteRenderer>();
     }
 
     // Start is called before the first frame update
@@ -47,7 +50,7 @@ public class CarController : MonoBehaviour
 
     private void PerformJump()
     {
-        if (isJumping)
+        if (isJumping || accelerationInput == 0)
         {
             return;
         }
@@ -57,18 +60,26 @@ public class CarController : MonoBehaviour
     private IEnumerator Jump()
     {
         isJumping = true;
+        Vector3 shadowPositionVector = new Vector3(1, -1) * 3;
+
         float startJumpTime = Utils.Times.CurrentFrame();
         float completedPercentage = 0f;
         while (completedPercentage < 1f)
         {
-            completedPercentage = (Utils.Times.CurrentFrame() - startJumpTime) / jumpDuration;
-            float increaseHeight = Utils.Numbers.SinOf(completedPercentage) * jumHeight;
+            completedPercentage = GetCompletedPercentage(startJumpTime, jumpDuration);
+            float increaseRate = Utils.Numbers.SinOf(completedPercentage) * jumHeight;
 
-            carRigidbody2D.transform.localScale = originScale * (1f + increaseHeight);
+            carRigidbody2D.transform.localScale = originScale * (1f + increaseRate);
+            shadow.transform.localPosition = shadowPositionVector * increaseRate;
+
             yield return 0;
         }
-
         isJumping = false;
+    }
+
+    private float GetCompletedPercentage(float startTime, float duration)
+    {
+        return (Utils.Times.CurrentFrame() - startTime) / duration;
     }
 
     //Frame-rate independent for physics calculations
