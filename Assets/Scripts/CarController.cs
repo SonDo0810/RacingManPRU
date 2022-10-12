@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,13 +16,14 @@ public class CarController : MonoBehaviour
     public float boostDuration = 3;
     public float boostIncrement = 10;
 
+    private float defaultMaxSpeed = 0;
     private float accelerationInput = 0;
     private float steeringInput = 0;
     private float rotationAngle = 0;
     private float velocityVsUp = 0;
 
     private bool isJumping = false;
-    private bool isBoosting = false;
+    private bool isTurboBoosting = false;
 
     private Vector3 originScale = new Vector3(1, 1, 1);
 
@@ -29,12 +31,23 @@ public class CarController : MonoBehaviour
     private Rigidbody2D carRigidbody2D;
     private SpriteRenderer shadow;
 
+    private String currentState;
+
+    private String SLOW_DOWN = "SLOW_DOWN";
+    private String BOOST_UP = "BOOST_UP";
+
+    private Collider2D currentCollider;
+    private String currentTriggerAction;
+
+    private String TriggerExit = "EXIT";
+    private String TriggerEnter = "ENTER";
 
     //Awake is called when the script instance is being loaded
     void Awake()
     {
         carRigidbody2D = GetComponent<Rigidbody2D>();
         shadow = GameObject.Find("Car").transform.GetChild(1).GetComponent<SpriteRenderer>();
+        this.defaultMaxSpeed = maxSpeed;
     }
 
     // Start is called before the first frame update
@@ -52,8 +65,20 @@ public class CarController : MonoBehaviour
         }
         if (Input.GetKey(KeyCode.Space))
         {
-            PerformBoost();
+            PerformTurboBoost();
         }
+    }
+
+    public void OnTriggerExit2D(Collider2D newCollider)
+    {
+        currentState = SLOW_DOWN;
+        PerformAccelerateTo(defaultMaxSpeed * 0.33f);
+    }
+
+    public void OnTriggerStay2D(Collider2D newCollider)
+    {
+        currentState = BOOST_UP;
+        PerformAccelerateTo(defaultMaxSpeed);
     }
 
     private void PerformJump()
@@ -84,33 +109,71 @@ public class CarController : MonoBehaviour
         }
     }
 
-    private void PerformBoost()
+    private void PerformTurboBoost()
     {
-        if (isBoosting || accelerationInput == 0)
+        if (isTurboBoosting || accelerationInput == 0)
         {
             return;
         }
-        StartCoroutine(Boost());
+        StartCoroutine(TurboBoost());
     }
 
 
-    private IEnumerator Boost()
+    private IEnumerator TurboBoost()
     {
-        isBoosting = true;
+        isTurboBoosting = true;
 
         float startJumpTime = Utils.Times.CurrentFrame();
-        float originAcceleration = this.accelerationInput;
-        float originMaxSpeed = this.maxSpeed;
-        this.maxSpeed = originMaxSpeed + this.boostIncrement;
-        while (isBoosting)
+        float originAcceleration = accelerationInput;
+        maxSpeed += boostIncrement;
+
+        while (isTurboBoosting)
         {
             float completedPercentage = GetCompletedPercentage(startJumpTime, boostDuration);
-            float increaseRate = Utils.Numbers.SinOf(completedPercentage) * jumHeight;
+            float increaseRate = Utils.Numbers.SinOf(completedPercentage);
 
             accelerationInput = originAcceleration + boostIncrement * (1f + increaseRate);
-            isBoosting = completedPercentage < 1f;
+            isTurboBoosting = completedPercentage < 1f;
             yield return 0;
         }
+    }
+
+    private void PerformAccelerateTo(float newSpeed)
+    {
+        if (accelerationInput == 0)
+        {
+            return;
+        }
+        StartCoroutine(AccelerateTo(newSpeed));
+    }
+
+
+    private IEnumerator AccelerateTo(float newSpeed)
+    {
+        float originSpeed = this.maxSpeed;
+        if (currentState.Equals(SLOW_DOWN))
+        {
+            float decrement = 0;
+            float maxDecrement = Mathf.Abs(maxSpeed - newSpeed);
+            while (currentState == SLOW_DOWN && decrement < maxDecrement)
+            {
+                decrement += 2;
+                maxSpeed = originSpeed - decrement;
+                yield return 0;
+            }
+        }
+        else
+        {
+            float increment = 0;
+            float maxIncrement = Mathf.Abs(maxSpeed - newSpeed);
+            while (currentState == BOOST_UP && increment < maxIncrement)
+            {
+                increment++;
+                maxSpeed = originSpeed + increment;
+                yield return 0;
+            }
+        }
+
     }
 
     private float GetCompletedPercentage(float startTime, float duration)
