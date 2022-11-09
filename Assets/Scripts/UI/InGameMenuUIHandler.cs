@@ -26,7 +26,7 @@ public class InGameMenuUIHandler : MonoBehaviour
 
     public void OnExitToMainMenu()
     {
-        SceneManager.LoadScene("Menu");
+        SceneManager.LoadScene("MainMenu");
     }
 
     IEnumerator ShowMenuCO()
