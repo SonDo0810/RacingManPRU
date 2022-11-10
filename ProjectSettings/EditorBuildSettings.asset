@@ -6,30 +6,45 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Menu.unity
-    guid: bec62098aeea28746b7996b2453658e2
+    path: Assets/Scenes/MainMenu.unity
+    guid: 50639e59762c8f74ba0471fa9e5787a4
   - enabled: 1
     path: Assets/Scenes/Map1.unity
     guid: b0205ab0c21af6942929bdaadfb21b18
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Example cases/TouchInput.unity
     guid: 0240d26010020824abfabe7a4ee9155c
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Example cases/SampleScene.unity
     guid: 2cda990e2423bbf4892e6590ba056729
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Example cases/SpawnCar.unity
     guid: 7bd6c5c37190e184497fa71a848a8552
   - enabled: 1
     path: Assets/Scenes/Map2.unity
     guid: f686e1ed86cafbc47b454bedcf29420a
   - enabled: 1
-    path: Assets/Scenes/LocalMultiplayer.unity
-    guid: a53ab97080c855f45846a9c0a87f16c8
+    path: Assets/Scenes/Map3.unity
+    guid: f4ca2bfae9a6af24aa059ee30ec2f6c5
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
   - enabled: 1
     path: Assets/Scenes/SelectMultiplePlayerMapScreen.unity
     guid: 92af55afd13ac8f44ae42d999980cc6b
   - enabled: 1
     path: Assets/Scenes/SelectSinglePlayerMapSceen.unity
     guid: ff9fde818dd273041a9ba370b43604ad
+  - enabled: 1
+    path: Assets/Scenes/LocalMultiplayer1.unity
+    guid: 1c8e24cbabb5e224fa9980823c69af9f
+  - enabled: 1
+    path: Assets/Scenes/LocalMultiplayer2.unity
+    guid: ad4082bd33a875a4a85ef3d79b202d51
+  - enabled: 1
+    path: Assets/Scenes/LocalMultiplayer3.unity
+    guid: 5d23973fc72080e4388079b07476c276
+  - enabled: 1
+    path: Assets/Scenes/Menu.unity
+    guid: bec62098aeea28746b7996b2453658e2
   m_configObjects: {}

@@ -246,7 +246,7 @@ public class CarAIHandler : MonoBehaviour
         maxSpeed = Mathf.Clamp(newSpeed, 0, orignalMaximumSpeed);
 
         float skillbasedMaxiumSpeed = Mathf.Clamp(skillLevel, 1.0f, 1.5f);
-        maxSpeed = maxSpeed * skillbasedMaxiumSpeed;
+        maxSpeed = 3 * maxSpeed * skillbasedMaxiumSpeed;
     }
 
 

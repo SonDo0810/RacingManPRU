@@ -18,10 +18,14 @@ public class ChooseMultiplePlayerMap : MonoBehaviour
     }
     public void SelectFirstMap()
     {
-        SceneManager.LoadScene("Menu");
+        SceneManager.LoadScene("LocalMultiplayer1");
     }
     public void SelectSecondMap()
     {
-        SceneManager.LoadScene("Menu");
+        SceneManager.LoadScene("LocalMultiplayer2");
+    }
+    public void SelectThirdMap()
+    {
+        SceneManager.LoadScene("LocalMultiplayer3");
     }
 }
